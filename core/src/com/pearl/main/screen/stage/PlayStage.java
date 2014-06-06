@@ -30,18 +30,20 @@ public class PlayStage extends Stage {
 		Playing, Solving, Wining
 	}
 
+	private Pearl game;
+	private int sizeBoard;
+	private SpriteBatch batch;
+	private CellType type;
+	private GameState gameState;
+
 	private boolean[][] lightBoard;
 	private boolean[][] solutionBoard;
+	private Cell[][] cellBoard;
 	private boolean[] stepBoard;
 	private int stepCount;
-	private Cell[][] cellBoard;
-	private Pearl game;
+
 	private LevelGeneration levelGeneration;
-	private int n;
-	private CellType type;
-	private SpriteBatch batch;
 	private Actor boardA;
-	private GameState gameState;
 	private int level;
 	private WinWorld winWorld;
 	private Vector2 lastSolve;
@@ -51,34 +53,42 @@ public class PlayStage extends Stage {
 
 		super(new StretchViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT));
 		batch = (SpriteBatch) getSpriteBatch();
+		Gdx.input.setInputProcessor(this);
+		
 		this.game = game;
-		this.n = n;
+		this.sizeBoard = n;
+		
 		if (n == 4)
 			type = CellType.LARGE;
 		else if (n == 5)
 			type = CellType.MEDIUM;
 		else
 			type = CellType.SMALL;
+		
 		level = Prefs.instance.levels.get(n);
+		
 		lightBoard = new boolean[n][n];
 		cellBoard = new Cell[n][n];
 		lastSolve = new Vector2(0, 0);
+		stepBoard = new boolean[n * n];
+		
+		
 		levelGeneration = new LevelGeneration();
 		levelGeneration.init(n);
-		stepBoard = new boolean[n * n];
+		
 		stepCount = 0;
-		Gdx.input.setInputProcessor(this);
+		
 		gameState = GameState.Playing;
 
 		createStageBoard();
 		loadLevel(level);
-		addStageActor();
-
+		
+		addStageActorUI();
 		addEventListenerForBoard();
 
 	}
 
-	private void addStageActor() {
+	private void addStageActorUI() {
 		// TODO Auto-generated method stub
 		SimpleAbstractActor reset = new SimpleAbstractActor(Assets.instance.reset, 280, 90);
 		addActor(reset);
@@ -117,7 +127,7 @@ public class PlayStage extends Stage {
 				// TODO Auto-generated method stub
 				if (gameState != GameState.Wining) {
 					Assets.instance.buttonS.play();
-					nextLevel();
+					setNextLevel();
 				}
 				super.clicked(event, x, y);
 			}
@@ -148,9 +158,10 @@ public class PlayStage extends Stage {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				// TODO Auto-generated method stub
-				if (gameState != GameState.Wining){
+				if (gameState != GameState.Wining) {
 					Assets.instance.buttonS.play();
-					game.setScreen(new MenuScreen(game));}
+					game.setScreen(new MenuScreen(game));
+				}
 			}
 		});
 
@@ -167,32 +178,97 @@ public class PlayStage extends Stage {
 
 	}
 
-	public void doSolve() {
+	private void createStageBoard() {
 		// TODO Auto-generated method stub
-		if (gameState == GameState.Solving) {
-
-			boolean found = false;
-			for (int i = 0; i < n && !found; i++) {
-				for (int j = 0; j < n && !found; j++) {
-					if (stepBoard[i * n + j]) {
-						found = true;
-						lastSolve.set(i, j);
-						cellBoard[i][j].setSolve(true);
-
-					}
-				}
-
+		for (int i = 0; i < sizeBoard; i++)
+			for (int j = 0; j < sizeBoard; j++) {
+				cellBoard[i][j] = new Cell(i, j, false, type);
+				addActor(cellBoard[i][j]);
 			}
-			for (int k = 0; k < n * n; k++)
-				System.out.print(" " + stepBoard[k]);
+	}
+
+	public void loadLevel(int level) {
+		// TODO Auto-generated method stub
+
+		int minimal_solution_length = (int) MathUtils.floor((float) (2 * Math.log(level) + 1));
+		if (type == CellType.MEDIUM)
+			minimal_solution_length = (int) MathUtils.floor((float) (3 * Math.log(level) + 1));
+		else if (type == CellType.SMALL)
+			minimal_solution_length = (int) MathUtils.floor((float) (10 * Math.log(level) + 1));
+
+		solutionBoard = levelGeneration.createSolution(minimal_solution_length);
+
+		resetBoard();
+
+	}
+
+	public void resetBoard() {
+		// TODO Auto-generated method stub
+		stepCount = 0;
+		for (int i = 0; i < sizeBoard; i++)
+			for (int j = 0; j < sizeBoard; j++) {
+				cellBoard[i][j].setLight(false);
+				lightBoard[i][j] = false;
+			}
+
+		for (int i = 0; i < sizeBoard; i++)
+			for (int j = 0; j < sizeBoard; j++)
+				stepBoard[i * sizeBoard + j] = solutionBoard[i][j];
+
+		gameState = GameState.Playing;
+		for (int i = 0; i < sizeBoard; i++)
+			for (int j = 0; j < sizeBoard; j++) {
+				if (solutionBoard[i][j]) {
+					toggleButton(i, j);
+				}
+			}
+	}
+
+	public void toggleButton(int i, int j) {
+		lightBoard[i][j] = (lightBoard[i][j] == false) ? true : false;
+		cellBoard[i][j].toggle();
+		if ((i + 1) < sizeBoard) {
+			lightBoard[i + 1][j] = (lightBoard[i + 1][j] == false) ? true : false;
+			cellBoard[i + 1][j].toggle();
 		}
+
+		if (i - 1 >= 0) {
+			lightBoard[i - 1][j] = (lightBoard[i - 1][j] == false) ? true : false;
+			cellBoard[i - 1][j].toggle();
+		}
+
+		if (j + 1 < sizeBoard) {
+			lightBoard[i][j + 1] = (lightBoard[i][j + 1] == false) ? true : false;
+			cellBoard[i][j + 1].toggle();
+		}
+
+		if (j - 1 >= 0) {
+			lightBoard[i][j - 1] = (lightBoard[i][j - 1] == false) ? true : false;
+			cellBoard[i][j - 1].toggle();
+		}
+	}
+
+	public void setNextLevel() {
+		if (gameState == GameState.Wining)
+			getRoot().removeActor(winWorld);
+		level++;
+		if (type == CellType.LARGE) {
+			if (level >= 6)
+				level = 6;
+		} else {
+			if (level > 100)
+				level = 100;
+		}
+
+		loadLevel(level);
+		Prefs.instance.save(sizeBoard, level);
 
 	}
 
 	private void addEventListenerForBoard() {
 		// TODO Auto-generated method stub
 		boardA = new Actor();
-		boardA.setBounds(17, 630 - n * type.getSize(), n * type.getSize(), n * type.getSize());
+		boardA.setBounds(17, 630 - sizeBoard * type.getSize(), sizeBoard * type.getSize(), sizeBoard * type.getSize());
 		addActor(boardA);
 
 		boardA.addListener(new ClickListener() {
@@ -201,11 +277,11 @@ public class PlayStage extends Stage {
 				// TODO Auto-generated method stub
 				if (!(gameState == GameState.Wining)) {
 					Assets.instance.cellS.play();
-					Vector2 pos = ScreenBoardCoorConvert.convertBoardAToBoardCoor((int) x, (int) y, type, n);
+					Vector2 pos = ScreenBoardCoorConvert.convertBoardAToBoardCoor((int) x, (int) y, type, sizeBoard);
 					int i = (int) pos.x;
 					int j = (int) pos.y;
 					stepCount++;
-					stepBoard[i * n + j] = stepBoard[i * n + j] ? false : true;
+					stepBoard[i * sizeBoard + j] = stepBoard[i * sizeBoard + j] ? false : true;
 					toggleButton(i, j);
 					if (gameState == GameState.Solving) {
 						cellBoard[(int) lastSolve.x][(int) lastSolve.y].setSolve(false);
@@ -221,8 +297,8 @@ public class PlayStage extends Stage {
 
 	private void checkWin() {
 		boolean win = true;
-		for (int i = 0; i < n && win; i++)
-			for (int j = 0; j < n && win; j++) {
+		for (int i = 0; i < sizeBoard && win; i++)
+			for (int j = 0; j < sizeBoard && win; j++) {
 				if (lightBoard[i][j])
 					win = false;
 			}
@@ -233,50 +309,29 @@ public class PlayStage extends Stage {
 			winWorld = new WinWorld(this);
 			addActor(winWorld);
 			gameState = GameState.Wining;
-			Prefs.instance.save(n, level);
+			Prefs.instance.save(sizeBoard, level);
 		}
 	}
 
-	public void loadLevel(int level) {
+	public void doSolve() {
 		// TODO Auto-generated method stub
+		if (gameState == GameState.Solving) {
 
-		int minimal_solution_length = (int) MathUtils.floor((float) (2 * Math.log(level) + 1));
-		if (type == CellType.MEDIUM)
-			minimal_solution_length = (int) MathUtils.floor((float) (3 * Math.log(level) + 1));
-		else if (type == CellType.SMALL)
-			minimal_solution_length = (int) MathUtils.floor((float) (10 * Math.log(level) + 1));
-		System.out.println("minimal" + minimal_solution_length);
+			boolean found = false;
+			for (int i = 0; i < sizeBoard && !found; i++) {
+				for (int j = 0; j < sizeBoard && !found; j++) {
+					if (stepBoard[i * sizeBoard + j]) {
+						found = true;
+						lastSolve.set(i, j);
+						cellBoard[i][j].setSolve(true);
 
-		solutionBoard = levelGeneration.createSolution(minimal_solution_length);
-		System.out.println("==========================================");
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				System.out.print(solutionBoard[i][j] + " ");
-			}
-			System.out.println();
-		}
-		System.out.println("==========================================");
-		resetBoard();
-
-	}
-
-	private void createStageBoard() {
-		// TODO Auto-generated method stub
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++) {
-				cellBoard[i][j] = new Cell(i, j, false, type);
-				addActor(cellBoard[i][j]);
-			}
-	}
-
-	public void toggleLightFromSolution() {
-
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++) {
-				if (solutionBoard[i][j]) {
-					toggleButton(i, j);
+					}
 				}
+
 			}
+			for (int k = 0; k < sizeBoard * sizeBoard; k++)
+				System.out.print(" " + stepBoard[k]);
+		}
 
 	}
 
@@ -294,72 +349,12 @@ public class PlayStage extends Stage {
 
 	}
 
-	public void toggleButton(int i, int j) {
-		lightBoard[i][j] = (lightBoard[i][j] == false) ? true : false;
-		cellBoard[i][j].isToggle();
-		if ((i + 1) < n) {
-			lightBoard[i + 1][j] = (lightBoard[i + 1][j] == false) ? true : false;
-			cellBoard[i + 1][j].isToggle();
-		}
-
-		if (i - 1 >= 0) {
-			lightBoard[i - 1][j] = (lightBoard[i - 1][j] == false) ? true : false;
-			cellBoard[i - 1][j].isToggle();
-		}
-
-		if (j + 1 < n) {
-			lightBoard[i][j + 1] = (lightBoard[i][j + 1] == false) ? true : false;
-			cellBoard[i][j + 1].isToggle();
-		}
-
-		if (j - 1 >= 0) {
-			lightBoard[i][j - 1] = (lightBoard[i][j - 1] == false) ? true : false;
-			cellBoard[i][j - 1].isToggle();
-		}
-	}
-
-	public void resetBoard() {
-		// TODO Auto-generated method stub
-		stepCount = 0;
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++) {
-				cellBoard[i][j].setLight(false);
-				lightBoard[i][j] = false;
-			}
-
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++)
-				stepBoard[i * n + j] = solutionBoard[i][j];
-
-		gameState = GameState.Playing;
-		toggleLightFromSolution();
-		// //////////////////////////////
-
+	public int getStepCount() {
+		return stepCount;
 	}
 
 	public int getLevel() {
 		return level;
 
-	}
-
-	public void nextLevel() {
-		if (gameState == GameState.Wining)
-			getRoot().removeActor(winWorld);
-		level++;
-		if (type == CellType.LARGE) {
-			if (level >= 6)
-				level = 6;
-		} else {
-			if (level > 100)
-				level = 100;
-		}
-
-		loadLevel(level);
-		Prefs.instance.save(n, level);
-
-	}
-
-	public int getStepCount() {
-		return stepCount;
 	}
 }

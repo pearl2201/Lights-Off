@@ -163,11 +163,5 @@ public class LevelGeneration {
 
 	}
 
-	public void getMap() {
-
-	}
-
-	public boolean[][] getSolution() {
-		return sol;
-	}
+	
 }

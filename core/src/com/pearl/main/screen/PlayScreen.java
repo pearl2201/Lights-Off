@@ -14,7 +14,6 @@ import com.pearl.main.utils.Constants;
 public class PlayScreen implements Screen {
 	private Pearl game;
 	private PlayStage stage;
-	private int difficult;
 	private boolean isPaused;
 	private Texture texture;
 

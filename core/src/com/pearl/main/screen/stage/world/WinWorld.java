@@ -30,7 +30,7 @@ public class WinWorld extends Group {
 					// TODO Auto-generated method stub
 					super.clicked(event, x, y);
 					Assets.instance.buttonS.play();
-					stage.nextLevel();
+					stage.setNextLevel();
 
 				}
 			});

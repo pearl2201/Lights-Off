@@ -9,7 +9,6 @@ import com.pearl.main.utils.ScreenBoardCoorConvert;
 public class Cell extends Actor {
 
 	private CellType type;
-	private boolean isToggle;
 	private boolean light;
 	private boolean solve;
 
@@ -17,12 +16,11 @@ public class Cell extends Actor {
 		super();
 		Vector2 pos = ScreenBoardCoorConvert.convertBoardToScreen(x, y, type);
 		setBounds(pos.x, pos.y, type.getSize(), type.getSize());
-		isToggle = false;
-		light = light;
+		this.light = light;
 		this.type = type;
 	}
 
-	public void isToggle() {
+	public void toggle() {
 		light = light ? false : true;
 		if (solve)
 			solve = false;
@@ -43,9 +41,8 @@ public class Cell extends Actor {
 	public void setLight(boolean light) {
 		this.light = light;
 	}
-	
-	public void setSolve(boolean solve)
-	{
+
+	public void setSolve(boolean solve) {
 		this.solve = solve;
 	}
 }

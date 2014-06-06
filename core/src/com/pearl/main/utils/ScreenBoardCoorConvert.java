@@ -6,15 +6,6 @@ import com.pearl.main.game.CellType;
 
 public class ScreenBoardCoorConvert {
 
-	public static Vector2 convertScreenToBoardCoor(int screenX, int screenY, CellType type) {
-		Vector2 board = new Vector2();
-		board.x = Math.floorDiv((630 - screenY), type.getSize()) - 1;
-		board.y = Math.floorDiv((screenX - 17), type.getSize());
-		System.out.println("board " + board.x + " " + board.y);
-		return board;
-
-	}
-
 	public static Vector2 convertBoardToScreen(int x, int y, CellType type) {
 		Vector2 screen = new Vector2();
 

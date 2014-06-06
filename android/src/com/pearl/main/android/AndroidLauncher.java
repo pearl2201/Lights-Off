@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -18,15 +17,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
-import android.widget.Toast;
-
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.pearl.main.Pearl;
 import com.pearl.main.game.IActivityRequestHandler;
 
@@ -74,7 +69,7 @@ public class AndroidLauncher extends AndroidApplication implements IActivityRequ
 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 
 		RelativeLayout layout = new RelativeLayout(this);
-		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT);
 		layout.setLayoutParams(params);
 
 		AdView admobView = createAdView();
@@ -100,7 +95,7 @@ public class AndroidLauncher extends AndroidApplication implements IActivityRequ
 		adView = new AdView(this);
 		adView.setAdSize(AdSize.SMART_BANNER);
 		adView.setAdUnitId(AD_UNIT_ID);
-		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
 		params.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
 		params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
 		adView.setLayoutParams(params);
@@ -111,7 +106,7 @@ public class AndroidLauncher extends AndroidApplication implements IActivityRequ
 	private View createGameView(AndroidApplicationConfiguration cfg) {
 		game = new Pearl(this);
 		gameView = initializeForView(game, cfg);
-		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
 		params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
 		params.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
 		// params.addRule(RelativeLayout.BELOW, adView.getId());
@@ -161,6 +156,7 @@ public class AndroidLauncher extends AndroidApplication implements IActivityRequ
 			Button b0 = new Button(this);
 			b0.setText("Resume");
 			b0.setOnClickListener(new OnClickListener() {
+				@Override
 				public void onClick(View v) {
 					game.resume();
 					dialog.dismiss();
@@ -171,6 +167,7 @@ public class AndroidLauncher extends AndroidApplication implements IActivityRequ
 			Button b1 = new Button(this);
 			b1.setText("Quit");
 			b1.setOnClickListener(new OnClickListener() {
+				@Override
 				public void onClick(View v) {
 					finish();
 				}
@@ -180,6 +177,7 @@ public class AndroidLauncher extends AndroidApplication implements IActivityRequ
 			Button b2 = new Button(this);
 			b2.setText("Rate My Game");
 			b2.setOnClickListener(new OnClickListener() {
+				@Override
 				public void onClick(View v) {
 					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_PLAY_URL)));
 					dialog.dismiss();

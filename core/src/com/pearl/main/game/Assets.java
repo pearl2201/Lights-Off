@@ -12,10 +12,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import com.pearl.main.utils.Constants;
 
-public class Assets implements Disposable, AssetErrorListener{
-	
+public class Assets implements Disposable, AssetErrorListener {
+
 	public static Assets instance = new Assets();
-	
+
 	public TextureRegion againB;
 	public TextureRegion arrowLeft;
 	public TextureRegion arrowRight;
@@ -50,13 +50,8 @@ public class Assets implements Disposable, AssetErrorListener{
 	public Sound buttonS;
 	public Sound cellS;
 	public Sound winS;
-	
-	
-	
-	
-	
-	public void load(AssetManager assetM)
-	{
+
+	public void load(AssetManager assetM) {
 		this.assetM = assetM;
 		assetM.load(Constants.TEXTUREATLAS_FILE_PATH, TextureAtlas.class);
 		assetM.load("image/font.fnt", BitmapFont.class);
@@ -64,52 +59,47 @@ public class Assets implements Disposable, AssetErrorListener{
 		assetM.load("sound/button.ogg", Sound.class);
 		assetM.load("sound/win.ogg", Sound.class);
 		assetM.load("sound/cell.ogg", Sound.class);
-		
-		
-		
-		
-		 
+
 	}
-	
-	public void getData()
-	{
+
+	public void getData() {
 		assetM.finishLoading();
 		font = assetM.get("image/font.fnt");
 		TextureAtlas atlas = assetM.get(Constants.TEXTUREATLAS_FILE_PATH);
-		
-		 againB = atlas.findRegion("again");
-		 arrowLeft = atlas.findRegion("arrow left");
-		 arrowRight = atlas.findRegion("arrow right");
-		 dark4 = atlas.findRegion("dark4");
-		 dark5 = atlas.findRegion("dark5");
-		 dark7 = atlas.findRegion("dark7");
-		 light4 = atlas.findRegion("light4");
-		 light5 = atlas.findRegion("light5");
-		 light7 = atlas.findRegion("light7");
-		 solve4 = atlas.findRegion("solve4");
-		 solve5 = atlas.findRegion("solve5");
-		 solve7 = atlas.findRegion("solve7");
-		 easy = atlas.findRegion("easy");
-		 exitB = atlas.findRegion("exit");
-		 footerL = atlas.findRegion("footer");
-		 hard = atlas.findRegion("hard");
-		 header = atlas.findRegion("header");
-		 logo = atlas.findRegion("logo");
-		 medium = atlas.findRegion("medium");
-		 menuB = atlas.findRegion("menu");
-		 playBg = atlas.findRegion("play bg");
-		 rate = atlas.findRegion("rate");
-		 reset = atlas.findRegion("reset");
-		 solve = atlas.findRegion("solve");
-		 win = atlas.findRegion("win");
-		 exitL = atlas.findRegion("exitL");
-		 next = atlas.findRegion("next");
-		 
-		 cellS = assetM.get("sound/cell.ogg", Sound.class);
-		 winS = assetM.get("sound/win.ogg", Sound.class);
-		 buttonS = assetM.get("sound/button.ogg", Sound.class);
-		 bgMusicM = assetM.get("music/bgmusic.ogg", Music.class);
-				 
+
+		againB = atlas.findRegion("again");
+		arrowLeft = atlas.findRegion("arrow left");
+		arrowRight = atlas.findRegion("arrow right");
+		dark4 = atlas.findRegion("dark4");
+		dark5 = atlas.findRegion("dark5");
+		dark7 = atlas.findRegion("dark7");
+		light4 = atlas.findRegion("light4");
+		light5 = atlas.findRegion("light5");
+		light7 = atlas.findRegion("light7");
+		solve4 = atlas.findRegion("solve4");
+		solve5 = atlas.findRegion("solve5");
+		solve7 = atlas.findRegion("solve7");
+		easy = atlas.findRegion("easy");
+		exitB = atlas.findRegion("exit");
+		footerL = atlas.findRegion("footer");
+		hard = atlas.findRegion("hard");
+		header = atlas.findRegion("header");
+		logo = atlas.findRegion("logo");
+		medium = atlas.findRegion("medium");
+		menuB = atlas.findRegion("menu");
+		playBg = atlas.findRegion("play bg");
+		rate = atlas.findRegion("rate");
+		reset = atlas.findRegion("reset");
+		solve = atlas.findRegion("solve");
+		win = atlas.findRegion("win");
+		exitL = atlas.findRegion("exitL");
+		next = atlas.findRegion("next");
+
+		cellS = assetM.get("sound/cell.ogg", Sound.class);
+		winS = assetM.get("sound/win.ogg", Sound.class);
+		buttonS = assetM.get("sound/button.ogg", Sound.class);
+		bgMusicM = assetM.get("music/bgmusic.ogg", Music.class);
+
 	}
 
 	@Override
@@ -129,8 +119,7 @@ public class Assets implements Disposable, AssetErrorListener{
 		font.dispose();
 	}
 
-	public boolean isFinishLoading()
-	{
+	public boolean isFinishLoading() {
 		return assetM.update();
 	}
 }
